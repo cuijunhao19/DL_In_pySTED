@@ -1,0 +1,17 @@
+certifi
+cycler
+Cython
+decorator
+imageio
+kiwisolver
+matplotlib
+networkx
+numpy
+pyparsing
+python-dateutil
+PyWavelets
+scikit-image
+scipy
+six
+tifffile
+tqdm
