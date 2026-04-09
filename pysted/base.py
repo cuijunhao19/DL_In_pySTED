@@ -1148,7 +1148,7 @@ class Microscope:
                  bleached_sub_datamaps_dict, a dict containing the results of bleaching on the subdatamaps
                  acquired_intensity, the intensity of the acquisition, used for interrupted acquisitions
         """
-
+    
         if seed is not None:
             numpy.random.seed(seed)
         datamap_pixelsize = datamap.pixelsize
@@ -1200,6 +1200,7 @@ class Microscope:
 
         raster_func = raster.raster_func_c_self_bleach_split_g
         sample_func = bleach_funcs.sample_molecules
+        
         raster_func(self, datamap, acquired_intensity, numpy.array(pixel_list).astype(numpy.int32), ratio, rows_pad,
                     cols_pad, laser_pad, prob_ex, prob_sted, pdt, p_ex, p_sted, bleach, bleached_sub_datamaps_dict,
                     seed, bleach_func, sample_func, steps)
@@ -1232,7 +1233,7 @@ class Microscope:
         temporal_acq_elts = {"intensity": acquired_intensity,
                              "prob_ex": prob_ex,
                              "prob_sted": prob_sted}
-
+        
         return returned_acquired_photons, bleached_sub_datamaps_dict, temporal_acq_elts
 
     def add_to_pixel_bank(self, n_pixels_per_tstep):

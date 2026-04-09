@@ -907,7 +907,11 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     order_range = range(order+1)
     half_window = (window_size -1) // 2
     # precompute coefficients
-    b = numpy.mat([[k**i for i in order_range] for k in range(-half_window, half_window+1)])
+
+    # # 原代码 NumPy 2.0 已移除.mat函数，官方推荐用 np.asmatrix 替代
+    # b = numpy.mat([[k**i for i in order_range] for k in range(-half_window, half_window+1)])
+    # 修改后的代码
+    b = numpy.asmatrix([[k**i for i in order_range] for k in range(-half_window, half_window+1)])
     m = numpy.linalg.pinv(b).A[deriv] * rate**deriv * math.factorial(deriv)
     # pad the signal at the extremes with
     # values taken from the signal itself
@@ -1569,6 +1573,7 @@ def action_execution_2(action_selected, frame_shape, starting_pixel, pxsize, dat
 
 def action_execution_g(action_selected, frame_shape, starting_pixel, pxsize, datamap, frozen_datamap, microscope,
                        pdt, p_ex, p_sted, intensity_map, bleach, t_stack_idx):
+    # print("get_signal_and_bleach 返回：intensity_map 类型 =", type(intensity_map))
     """
     Executes the selected action. 
     
@@ -1612,13 +1617,23 @@ def action_execution_g(action_selected, frame_shape, starting_pixel, pxsize, dat
         pixel_list = generate_raster_pixel_list(microscope.pixel_bank, starting_pixel, frozen_datamap)
         pixel_list = pixel_list_filter(frozen_datamap, pixel_list, datamap.pixelsize, datamap.pixelsize,
                                        output_empty=True)
-
-    acq, bleached_dict, intensity_map = microscope.get_signal_and_bleach(datamap, pxsize, pdt, p_ex, p_sted,
-                                                                         acquired_intensity=intensity_map,
-                                                                         pixel_list=pixel_list, bleach=bleach,
-                                                                         update=True, filter_bypass=True,
-                                                                         indices=t_stack_idx)
-
+    
+    # acq, bleached_dict, intensity_map = microscope.get_signal_and_bleach(datamap, pxsize, pdt, p_ex, p_sted,
+    #                                                                      acquired_intensity=intensity_map,
+    #                                                                      pixel_list=pixel_list, bleach=bleach,
+    #                                                                      update=True, filter_bypass=True,
+    #                                                                      indices=t_stack_idx)
+    
+    acq, bleached_dict, temporal_acq_elts = microscope.get_signal_and_bleach(
+        datamap, pxsize, pdt, p_ex, p_sted,
+        acquired_intensity=intensity_map,  # 确保传入的是 ndarray
+        pixel_list=pixel_list, 
+        bleach=bleach,
+        update=True, 
+        filter_bypass=True,
+        indices=t_stack_idx
+    )
+    intensity_map = temporal_acq_elts["intensity"]
     return acq, intensity_map, datamap, pixel_list
 
 def make_path_sane(p):
